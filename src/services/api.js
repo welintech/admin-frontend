@@ -39,6 +39,37 @@ export const authAPI = {
   },
 };
 
+// Vendors related API calls
+export const vendorsAPI = {
+  getAllVendors: async () => {
+    try {
+      const response = await api.get('/vendors');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+
+  registerVendor: async (vendorData) => {
+    try {
+      const response = await api.post('/auth/register', {
+        username: vendorData.username,
+        password: vendorData.password,
+        role: 'vendor',
+        vendorData: {
+          name: vendorData.name,
+          email: vendorData.email,
+          phone: vendorData.phone,
+          address: vendorData.address
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
+};
+
 // Add more API sections here as needed
 // Example:
 // export const userAPI = { ... }
