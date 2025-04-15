@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'https://welin-dashboard-backend-493mx.ondigitalocean.app/api';
+// const API_BASE_URL = 'http://localhost:5000/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -68,11 +69,21 @@ export const vendorsAPI = {
       throw error.response?.data || error.message;
     }
   },
+
+  getVendorMembers: async (vendorId, page = 1, limit = 10, search = '') => {
+    try {
+      const response = await api.get(`/vendors/${vendorId}/members`, {
+        params: {
+          page,
+          limit,
+          search
+        }
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || error.message;
+    }
+  },
 };
 
-// Add more API sections here as needed
-// Example:
-// export const userAPI = { ... }
-// export const contentAPI = { ... }
-
-export default api; 
+export default api;

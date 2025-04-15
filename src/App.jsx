@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Vendors from './pages/Vendors';
+import Members from './pages/Members';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import Header from './components/Header';
@@ -27,6 +28,12 @@ function App() {
             <Route path="/vendors" element={
               <ProtectedRoute>
                 <Vendors />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/vendors/:vendorId/members" element={
+              <ProtectedRoute>
+                <Members />
               </ProtectedRoute>
             } />
 

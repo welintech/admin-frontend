@@ -55,12 +55,12 @@
 }
 
 .form-input {
-  padding: 12px;
+  /* padding: 15px; */
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   width: 100%;
-  box-sizing: border-box;
+  /* box-sizing: border-box; */
 }
 
 .form-input:focus {
@@ -71,7 +71,15 @@
 
 .input-container {
   position: relative;
-  width: 100%;
+  display: inline-block;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  /* transform: translateY(-50%); */
+  cursor: pointer;
 }
 
 .password-toggle {

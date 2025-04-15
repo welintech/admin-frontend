@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { vendorsAPI } from '../services/api';
 import { format } from 'date-fns';
 import VendorForm from '../components/VendorForm';
 import './Vendors.css';
 
 const Vendors = () => {
+  const navigate = useNavigate();
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -14,7 +16,6 @@ const Vendors = () => {
     const fetchVendors = async () => {
       try {
         const data = await vendorsAPI.getAllVendors();
-        // consoles.log(data);
         setVendors(data.data);
       } catch (err) {
         setError(err.message || 'Failed to fetch vendors');
@@ -51,6 +52,10 @@ const Vendors = () => {
     } catch (err) {
       setError(err.message || 'Failed to create vendor');
     }
+  };
+
+  const handleViewMembers = (vendorId) => {
+    navigate(`/vendors/${vendorId}/members`);
   };
 
   if (loading) {
@@ -111,7 +116,12 @@ const Vendors = () => {
 
             <div className="vendor-card-footer">
               <button className="edit-button">Edit</button>
-              <button className="view-button">View Members</button>
+              <button 
+                className="view-button"
+                onClick={() => handleViewMembers(vendor._id)}
+              >
+                View Members
+              </button>
             </div>
           </div>
         ))}
@@ -133,4 +143,4 @@ const Vendors = () => {
   );
 };
 
-export default Vendors; 
+export default Vendors;
