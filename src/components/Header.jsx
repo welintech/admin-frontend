@@ -1,39 +1,24 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { FaSignOutAlt } from 'react-icons/fa';
-import './Header.css';
+import styled from "styled-components";
+import UserAvatar from "../UI/UserAvatar";
+import HeaderMenu from "./HeaderMenu";
 
-const Header = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
+const StyledHeader = styled.header`
+  background-color: var(--color-grey-0);
+  padding: 1.2rem 4.8rem;
+  border-bottom: 1px solid var(--color-grey-100);
+  display: flex;
+  gap: 2.4rem;
+  align-items: center;
+  justify-content: flex-end;
+`;
 
-  const handleLogout = () => {
-    // Clear the auth token
-    localStorage.removeItem('adminToken');
-    // Redirect to login
-    navigate('/login');
-  };
-
-  // Don't show header on login page
-  if (location.pathname === '/login') {
-    return null;
-  }
-
+function Header() {
   return (
-    <header className="header">
-      <div className="header-content">
-        <div className="header-left">
-          <h1 className="header-title">Welin Admin</h1>
-        </div>
-        <div className="header-right">
-          <button onClick={handleLogout} className="logout-button">
-            <FaSignOutAlt />
-            <span>Logout</span>
-          </button>
-        </div>
-      </div>
-    </header>
+    <StyledHeader>
+      <UserAvatar />
+      <HeaderMenu />
+    </StyledHeader>
   );
-};
+}
 
-export default Header; 
+export default Header;
