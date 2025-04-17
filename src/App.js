@@ -6,6 +6,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import VendorDashboard from './pages/VendorDashboard';
 import UserDashboard from './pages/UserDashboard';
 import PrivateRoute from './components/PrivateRoute';
+import UsersPage from './pages/UsersPage';
+import VendorsPage from './pages/VendorsPage';
 
 function App() {
   return (
@@ -34,6 +36,20 @@ function App() {
           element={
             <PrivateRoute role='user'>
               <UserDashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route path='/admin/users' element={
+          <PrivateRoute role='admin'>
+            <UsersPage />
+          </PrivateRoute>
+          
+          } />
+        <Route
+          path='/admin/vendors'
+          element={
+            <PrivateRoute role='admin'>
+              <VendorsPage />
             </PrivateRoute>
           }
         />
