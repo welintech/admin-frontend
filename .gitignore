@@ -7,3 +7,7 @@
 /.env
 .env
 env
+.vscode
+/.DS_Store
+/.idea
+/.vscode
