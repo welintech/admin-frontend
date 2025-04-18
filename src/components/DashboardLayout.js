@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../hooks/useAuth';
 
@@ -22,7 +22,7 @@ const MainContent = styled.div`
   padding: 2rem;
 `;
 
-const NavItem = styled(Link)`
+const NavItem = styled(NavLink)`
   display: block;
   padding: 0.75rem 1rem;
   color: #4b5563;
@@ -32,6 +32,10 @@ const NavItem = styled(Link)`
   &:hover {
     background-color: #f3f4f6;
     color: #1f2937;
+  }
+  &.active {
+    background-color: #e0f2f1; /* Professional teal background color */
+    color: #004d40; /* Dark teal text color */
   }
 `;
 
@@ -47,13 +51,11 @@ const DashboardLayout = ({ children, title }) => {
   return (
     <DashboardContainer>
       <Sidebar>
-        <h2 className='text-xl font-bold mb-6 text-gray-800'>Dashboard</h2>
         <div className='mb-8'>
-          <p className='text-sm text-gray-600'>Welcome,</p>
-          <p className='font-semibold text-gray-800'>{user?.name}</p>
+          <h2 className='text-xl font-semibold text-gray-700 mb-4'>Welcome, <span className='text-blue-500'>{user?.username}</span></h2>
         </div>
         <nav>
-          <NavItem to={`/${user?.role}`}>Overview</NavItem>
+          <NavItem to={`/${user?.role}`} end>Overview</NavItem>
           {user?.role === 'admin' && (
             <>
               <NavItem to='/admin/users'>Users</NavItem>
