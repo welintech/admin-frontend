@@ -1,4 +1,4 @@
-# Admin Frontend
+# Admin Frontend.
 
 A modern web application built with React.js, featuring role-based access control, real-time notifications, and responsive design.
 
