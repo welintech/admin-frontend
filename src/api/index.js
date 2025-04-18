@@ -1,11 +1,7 @@
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL;
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
-
-if (!API_URL) {
-  throw new Error('REACT_APP_API_URL is not set in environment variables');
-}
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
 
 // Create axios instance with default config
 const api = axios.create({
