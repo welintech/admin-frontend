@@ -8,6 +8,7 @@ import Button from '../Button';
 import Modal from '../Modal';
 import api from '../../api';
 import { toast } from 'react-toastify';
+import PasswordInput from '../PasswordInput';
 
 const Form = styled.form`
   display: flex;
@@ -183,15 +184,21 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
           error={errors.email}
           required
         />
-        <FormInput
-          label='Password'
-          name='password'
-          type='password'
-          value={formData.password}
-          onChange={handleChange}
-          error={errors.password}
-          required
-        />
+        <div>
+          <label className='block text-sm font-medium text-gray-700'>
+            Password
+          </label>
+          <PasswordInput
+            name='password'
+            value={formData.password}
+            onChange={handleChange}
+            placeholder='Enter password'
+            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+          />
+          {errors.password && (
+            <p className='mt-1 text-sm text-red-600'>{errors.password}</p>
+          )}
+        </div>
         <FormInput
           label='Mobile Number'
           name='mobile'

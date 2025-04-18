@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
+import PasswordInput from '../components/PasswordInput';
 
 const RegisterContainer = styled.div`
   display: flex;
@@ -90,20 +91,16 @@ const Register = () => {
           />
         </div>
         <div className='mb-4'>
-          <label
-            className='block text-gray-700 text-sm font-bold mb-2'
-            htmlFor='password'
-          >
+          <label htmlFor='password' className='sr-only'>
             Password
           </label>
-          <input
-            className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline'
+          <PasswordInput
             id='password'
-            type='password'
             name='password'
             value={formData.password}
-            onChange={handleChange}
-            required
+            onChange={(e) => handleChange(e)}
+            placeholder='Password'
+            className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm'
           />
         </div>
         <div className='mb-6'>

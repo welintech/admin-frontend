@@ -279,6 +279,12 @@ export const UserCardComponent = ({ user }) => {
               {new Date(user.createdAt).toLocaleDateString()}
             </DetailValue>
           </DetailRow>
+          {user.memberCount > 0 && (
+            <DetailRow>
+              <DetailLabel>Members:</DetailLabel>
+              <DetailValue>{user.memberCount}</DetailValue>
+            </DetailRow>
+          )}
         </UserDetails>
         <StatusIndicator data-active={user.isActive}>
           <StatusIcon data-active={user.isActive}>

@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { theme } from '../styles/theme';
+import PasswordInput from '../components/PasswordInput';
 
 const LoginContainer = styled.div`
   display: flex;
@@ -112,12 +113,10 @@ const Login = () => {
           />
         </div>
         <div>
-          <Input
-            type='password'
-            placeholder='Password'
+          <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            required
+            placeholder='Password'
           />
         </div>
         <Button type='submit' disabled={isLoading}>
