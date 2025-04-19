@@ -25,7 +25,10 @@ const DashboardLayout = ({ children, title }) => {
               marginBottom: '1rem',
             }}
           >
-            Welcome, <span style={{ color: '#3b82f6' }}>{user?.name}</span>
+            Welcome,{' '}
+            <span style={{ color: '#3b82f6' }}>
+              {user?.name || user.memberName}
+            </span>
           </h2>
         </div>
         <nav>
@@ -44,6 +47,8 @@ const DashboardLayout = ({ children, title }) => {
           )}
           {user?.role === 'vendor' && (
             <>
+              <Layout.NavItem>Items</Layout.NavItem>
+              <Layout.NavItem>Services</Layout.NavItem>
               {/* <Layout.NavItem as={NavLink} to='/vendor/items'>
                 Items
               </Layout.NavItem>
@@ -54,12 +59,14 @@ const DashboardLayout = ({ children, title }) => {
           )}
           {user?.role === 'user' && (
             <>
-              <Layout.NavItem as={NavLink} to='/user/profile'>
+              <Layout.NavItem>Profile</Layout.NavItem>
+              <Layout.NavItem>Activity</Layout.NavItem>
+              {/* <Layout.NavItem as={NavLink} to='/user/profile'>
                 Profile
               </Layout.NavItem>
               <Layout.NavItem as={NavLink} to='/user/activity'>
                 Activity
-              </Layout.NavItem>
+              </Layout.NavItem> */}
             </>
           )}
         </nav>

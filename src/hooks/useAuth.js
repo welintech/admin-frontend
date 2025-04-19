@@ -8,53 +8,93 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+    try {
+      const storedUser = localStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error('Error parsing user from localStorage:', error);
+      return null;
+    }
   });
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem('token');
+    } catch (error) {
+      console.error('Error getting token from localStorage:', error);
+      return null;
+    }
+  });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUser = localStorage.getItem('user');
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+    try {
+      const storedToken = localStorage.getItem('token');
+      const storedUser = localStorage.getItem('user');
+      if (storedToken && storedUser) {
+        setToken(storedToken);
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Error initializing auth state:', error);
+      // Clear invalid data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }, []);
 
   const loginMutation = useMutation({
-    mutationFn: async (credentials) => {
-      const response = await api.post('/auth/login', credentials);
+    mutationFn: async ({ email, password, endpoint = '/auth/login' }) => {
+      setLoading(true);
+      const response = await api.post(endpoint, { email, password });
       return response.data;
     },
     onSuccess: (data) => {
-      if (data.success) {
-        setUser(data.data.user);
-        setToken(data.data.token);
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify(data.data.user));
-        toast.success('Login successful');
-        navigate(`/${data.data.user.role}`);
+      if (data?.success && data?.data) {
+        try {
+          const { user, token } = data.data;
+          if (!user || !token) {
+            throw new Error('Invalid response structure');
+          }
+
+          setUser(user);
+          setToken(token);
+          localStorage.setItem('token', token);
+          localStorage.setItem('user', JSON.stringify(user));
+          toast.success('Login successful');
+
+          // Navigate based on user role or default to dashboard
+          const role = user?.role;
+          navigate(`/${role}`);
+        } catch (error) {
+          console.error('Error saving auth data:', error);
+          toast.error('Error processing login response');
+        }
       } else {
-        toast.error(data.message || 'Login failed');
+        toast.error(data?.message || 'Login failed');
       }
+      setLoading(false);
     },
     onError: (error) => {
       toast.error(error.response?.data?.message || 'Login failed');
+      setLoading(false);
     },
   });
 
-  const login = (credentials) => {
-    loginMutation.mutate(credentials);
+  const login = ({ email, password, endpoint = '/auth/login' }) => {
+    loginMutation.mutate({ email, password, endpoint });
   };
 
   const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    navigate('/login');
+    try {
+      setUser(null);
+      setToken(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   const value = {
@@ -62,6 +102,7 @@ export const AuthProvider = ({ children }) => {
     token,
     login,
     logout,
+    loading,
     isAuthenticated: !!token,
   };
 

@@ -30,6 +30,28 @@ const FormTitle = styled.h2`
   margin-bottom: ${theme.spacing.xl};
 `;
 
+const TabsContainer = styled.div`
+  display: flex;
+  margin-bottom: ${theme.spacing.xl};
+  border-bottom: 1px solid ${theme.colors.secondary.dark};
+`;
+
+const Tab = styled.button`
+  flex: 1;
+  padding: ${theme.spacing.sm};
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: ${theme.typography.body.fontSize};
+  color: ${theme.colors.text.secondary};
+  border-bottom: 2px solid transparent;
+
+  &[data-active='true'] {
+    color: ${theme.colors.primary.main};
+    border-bottom: 2px solid ${theme.colors.primary.main};
+  }
+`;
+
 const Input = styled.input`
   width: 100%;
   padding: ${theme.spacing.sm};
@@ -69,6 +91,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('vendor'); // 'vendor' or 'member'
   const { login } = useAuth();
 
   const validateEmail = (email) => {
@@ -91,7 +114,9 @@ const Login = () => {
 
     setIsLoading(true);
     try {
-      await login({ email, password });
+      const endpoint =
+        activeTab === 'member' ? '/auth/member/login' : '/auth/login';
+      await login({ email, password, endpoint });
     } catch (error) {
       toast.error(error.message || 'Login failed');
     } finally {
@@ -99,16 +124,37 @@ const Login = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e);
+    }
+  };
+
   return (
     <LoginContainer>
       <LoginForm onSubmit={handleSubmit}>
         <FormTitle>Login</FormTitle>
+        <TabsContainer>
+          <Tab
+            data-active={activeTab === 'vendor' ? 'true' : 'false'}
+            onClick={() => setActiveTab('vendor')}
+          >
+            Vendor
+          </Tab>
+          <Tab
+            data-active={activeTab === 'member' ? 'true' : 'false'}
+            onClick={() => setActiveTab('member')}
+          >
+            Member
+          </Tab>
+        </TabsContainer>
         <div>
           <Input
             type='email'
             placeholder='Email'
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
             required
           />
         </div>
@@ -116,6 +162,7 @@ const Login = () => {
           <PasswordInput
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder='Password'
           />
         </div>
