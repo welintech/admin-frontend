@@ -14,7 +14,8 @@ const UsersPage = () => {
     queryKey: ['users'],
     queryFn: async () => {
       const response = await api.get('/admin/users');
-      return response.data.data.filter((user) => user.role === 'user');
+      // return response.data.data.filter((user) => user.role === 'user');
+      return response.data.data;
     },
   });
 

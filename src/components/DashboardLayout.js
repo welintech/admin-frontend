@@ -25,7 +25,7 @@ const DashboardLayout = ({ children, title }) => {
               marginBottom: '1rem',
             }}
           >
-            Welcome, <span style={{ color: '#3b82f6' }}>{user?.username}</span>
+            Welcome, <span style={{ color: '#3b82f6' }}>{user?.name}</span>
           </h2>
         </div>
         <nav>
@@ -44,12 +44,12 @@ const DashboardLayout = ({ children, title }) => {
           )}
           {user?.role === 'vendor' && (
             <>
-              <Layout.NavItem as={NavLink} to='/vendor/items'>
+              {/* <Layout.NavItem as={NavLink} to='/vendor/items'>
                 Items
               </Layout.NavItem>
               <Layout.NavItem as={NavLink} to='/vendor/services'>
                 Services
-              </Layout.NavItem>
+              </Layout.NavItem> */}
             </>
           )}
           {user?.role === 'user' && (

@@ -8,9 +8,10 @@ import {
   LoadingSpinner,
   Spinner,
 } from '../components/UserCard/UserCard';
+import { useVendorsMembers } from '../hooks/useVendorMembers';
 
 const VendorsPage = () => {
-  const { data: vendors, isLoading } = useQuery({
+  const { data: vendors, isLoading: isVendorsLoading } = useQuery({
     queryKey: ['vendors'],
     queryFn: async () => {
       const response = await api.get('/admin/users');
@@ -18,7 +19,15 @@ const VendorsPage = () => {
     },
   });
 
-  if (isLoading) {
+  const vendorIds = React.useMemo(
+    () => vendors?.map((vendor) => vendor._id) || [],
+    [vendors]
+  );
+
+  const { data: membersData, isLoading: isMembersLoading } =
+    useVendorsMembers(vendorIds);
+
+  if (isVendorsLoading || isMembersLoading) {
     return (
       <DashboardLayout title='Vendors'>
         <LoadingSpinner>
@@ -31,9 +40,19 @@ const VendorsPage = () => {
   return (
     <DashboardLayout title='Vendors'>
       <UsersGrid>
-        {vendors.map((vendor) => (
-          <UserCardComponent key={vendor._id} user={vendor} />
-        ))}
+        {vendors.map((vendor) => {
+          const memberCount = membersData?.[vendor._id]?.length || 0;
+
+          return (
+            <UserCardComponent
+              key={vendor._id}
+              user={{
+                ...vendor,
+                memberCount,
+              }}
+            />
+          );
+        })}
       </UsersGrid>
     </DashboardLayout>
   );
