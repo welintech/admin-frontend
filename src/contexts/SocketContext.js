@@ -9,13 +9,12 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    if (process.env.REACT_APP_ENABLE_SOCKET_IO === 'true') {
-      const socketUrl =
-        process.env.REACT_APP_API_URL?.replace('/api', '') ||
-        'http://localhost:5000';
+    const isSocketEnabled = import.meta.env.VITE_ENABLE_SOCKET === 'true';
+    const socketUrl = import.meta.env.VITE_APP_SOCKET_URL;
+
+    if (isSocketEnabled && socketUrl) {
       const newSocket = io(socketUrl);
       setSocket(newSocket);
-
       return () => newSocket.close();
     }
   }, []);
