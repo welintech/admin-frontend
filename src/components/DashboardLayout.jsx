@@ -48,13 +48,9 @@ const DashboardLayout = ({ children, title }) => {
           {user?.role === 'vendor' && (
             <>
               <Layout.NavItem>Items</Layout.NavItem>
-              <Layout.NavItem>Services</Layout.NavItem>
-              {/* <Layout.NavItem as={NavLink} to='/vendor/items'>
-                Items
-              </Layout.NavItem>
-              <Layout.NavItem as={NavLink} to='/vendor/services'>
+              <Layout.NavItem as={NavLink} to='/vendor/services/service-1'>
                 Services
-              </Layout.NavItem> */}
+              </Layout.NavItem>
             </>
           )}
           {user?.role === 'user' && (

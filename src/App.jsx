@@ -8,6 +8,8 @@ import UserDashboard from './pages/UserDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import UsersPage from './pages/UsersPage';
 import VendorsPage from './pages/VendorsPage';
+import Services from './pages/vendor/Services';
+import PaymentTest from './components/PaymentTest';
 
 function App() {
   return (
@@ -32,6 +34,14 @@ function App() {
           }
         />
         <Route
+          path='/vendor/services/:serviceId'
+          element={
+            <PrivateRoute role='vendor'>
+              <Services />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path='/user'
           element={
             <PrivateRoute role='user'>
@@ -39,12 +49,14 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path='/admin/users' element={
-          <PrivateRoute role='admin'>
-            <UsersPage />
-          </PrivateRoute>
-          
-          } />
+        <Route
+          path='/admin/users'
+          element={
+            <PrivateRoute role='admin'>
+              <UsersPage />
+            </PrivateRoute>
+          }
+        />
         <Route
           path='/admin/vendors'
           element={
@@ -53,6 +65,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route path='/test-payment' element={<PaymentTest />} />
         <Route path='/' element={<Navigate to='/login' replace />} />
       </Routes>
     </div>
