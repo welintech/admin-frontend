@@ -80,11 +80,11 @@ const usePaymentApi = () => {
    * @param {string} status - New payment status ('pending' | 'completed' | 'failed' | 'refunded')
    * @returns {Promise<Object>} Updated payment data
    */
-  const updatePayment = async (id, status) => {
+  const updatePayment = async (id, status, memberId) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await api.put(`/payments/${id}`, { status });
+      const response = await api.put(`/payments/${id}`, { status, memberId });
       return response.data;
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to update payment');

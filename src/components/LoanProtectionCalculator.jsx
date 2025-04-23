@@ -137,7 +137,6 @@ const LoanProtectionCalculator = () => {
     try {
       const response = await api.post('/loan-cover', {
         memberId: selectedMember,
-        vendorId: vendorData._id,
         loanAmount: premiumDetails.actualLoanAmount,
         coverageStartDate: loanStartDate,
         coverageEndDate: loanEndDate,
@@ -164,10 +163,9 @@ const LoanProtectionCalculator = () => {
       amount: premiumDetails.totalPremium.toString(),
       currency: 'INR',
       paymentMethod,
-      description: `Loan Protection Premium - ${selectedMember}`,
       status: 'pending',
-      user: selectedMember,
-      loanCoverId: loanCover._id,
+      productId: loanCover._id,
+      type: 'loneCover',
     });
 
     return paymentResponse;
@@ -224,7 +222,7 @@ const LoanProtectionCalculator = () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Update payment status to completed
-      await updatePayment(paymentId, 'completed');
+      await updatePayment(paymentId, 'completed', selectedMember);
       setPaymentStatus('completed');
       toast.success('Payment completed successfully!');
 
@@ -354,10 +352,6 @@ const LoanProtectionCalculator = () => {
       <div className='flex justify-between'>
         <span className='text-gray-600'>Payment ID:</span>
         <span className='font-medium'>{paymentDetails.paymentId}</span>
-      </div>
-      <div className='flex justify-between'>
-        <span className='text-gray-600'>Description:</span>
-        <span className='font-medium'>{paymentDetails.description}</span>
       </div>
     </>
   );

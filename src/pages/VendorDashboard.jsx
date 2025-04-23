@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../components/DashboardLayout';
+import { MdVisibility } from 'react-icons/md';
 import {
   useTable,
   useSortBy,
@@ -19,6 +20,8 @@ import MemberActions from '../components/MemberActions';
 import PasswordInput from '../components/PasswordInput';
 
 const MembersTable = React.memo(({ members, onEdit, onDelete }) => {
+  console.log(members);
+
   const columns = React.useMemo(
     () => [
       {
@@ -51,6 +54,36 @@ const MembersTable = React.memo(({ members, onEdit, onDelete }) => {
         Header: 'Created At',
         accessor: 'createdAt',
         Cell: ({ value }) => format(new Date(value), 'MM/dd/yyyy HH:mm'),
+      },
+      {
+        Header: 'Products',
+        accessor: 'products',
+        Cell: ({ value, row }) => {
+          const hasValidProducts = value?.some(
+            (product) => product.paymentStatus === true
+          );
+          const productTypes = value
+            ?.filter((product) => product.paymentStatus === true)
+            .map((product) => product.type);
+
+          return hasValidProducts ? (
+            <div className='relative group cursor-pointer'>
+              <MdVisibility
+                onClick={() =>
+                  window.open(`/member-products/${row.original._id}`, '_blank')
+                }
+                className='w-6 h-6 text-blue-600 hover:text-blue-800 transition-colors duration-200'
+              />
+              <div className='hidden group-hover:block absolute z-10 w-56 py-2 px-3 mt-1 -ml-2 text-sm bg-white text-gray-700 rounded-lg shadow-lg transform scale-100 transition-all duration-200 ease-in-out whitespace-pre leading-relaxed border border-gray-200'>
+                {productTypes.join('\n')}
+              </div>
+            </div>
+          ) : (
+            <span className='text-gray-400 italic text-sm'>
+              No active products
+            </span>
+          );
+        },
       },
       {
         Header: 'Actions',
@@ -136,9 +169,18 @@ const MembersTable = React.memo(({ members, onEdit, onDelete }) => {
         <tbody className='bg-white divide-y divide-gray-200'>
           {page.map((row) => {
             prepareRow(row);
+            const hasValidProducts = row.original.products?.some(
+              (product) => product.paymentStatus === true
+            );
             const { key, ...rowProps } = row.getRowProps();
             return (
-              <tr key={key} {...rowProps}>
+              <tr
+                key={key}
+                {...rowProps}
+                className={`${
+                  hasValidProducts ? 'bg-green-50' : ''
+                } hover:bg-gray-50`}
+              >
                 {row.cells.map((cell) => {
                   const { key, ...cellProps } = cell.getCellProps();
                   return (
