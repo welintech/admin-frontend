@@ -1,3 +1,4 @@
+// Vendor Dashboard Page
 import React, { useState, useMemo, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import DashboardLayout from '../components/DashboardLayout';
@@ -20,8 +21,6 @@ import MemberActions from '../components/MemberActions';
 import PasswordInput from '../components/PasswordInput';
 
 const MembersTable = React.memo(({ members, onEdit, onDelete }) => {
-  console.log(members);
-
   const columns = React.useMemo(
     () => [
       {

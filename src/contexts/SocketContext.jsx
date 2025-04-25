@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import { isSocketEnabled, SOCKET_URL } from '../api';
 
 const SocketContext = createContext();
 
@@ -9,11 +10,8 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const isSocketEnabled = import.meta.env.VITE_ENABLE_SOCKET === 'true';
-    const socketUrl = import.meta.env.VITE_APP_SOCKET_URL;
-
-    if (isSocketEnabled && socketUrl) {
-      const newSocket = io(socketUrl);
+    if (isSocketEnabled === 'true' && SOCKET_URL) {
+      const newSocket = io(SOCKET_URL);
       setSocket(newSocket);
       return () => newSocket.close();
     }
