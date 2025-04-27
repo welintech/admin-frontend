@@ -13,7 +13,10 @@ export default defineConfig({
   server: {
     port: 8080,
     host: true,
-    allowedHosts: ['portal.welin.in'],
+    allowedHosts: [
+      'portal.welin.in',
+      'admin-frontend-arlxz.ondigitalocean.app',
+    ],
   },
   build: {
     outDir: 'dist',
