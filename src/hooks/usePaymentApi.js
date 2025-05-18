@@ -21,14 +21,31 @@ const usePaymentApi = () => {
    * @param {string} paymentData.user - User ID who is making the payment
    * @returns {Promise<Object>} Created payment data
    */
-  const createPayment = async (paymentData) => {
+  const createOrder = async (paymentData) => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await api.post('/payments', paymentData);
-      return response.data;
+
+      return response.data.data;
     } catch (error) {
       setError(error.response?.data?.message || 'Failed to create payment');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getOrderDetails = async (orderId) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await api.get(`/payments/${orderId}`);
+      return response.data.data;
+    } catch (error) {
+      setError(
+        error.response?.data?.message || 'Failed to fetch order details'
+      );
       throw error;
     } finally {
       setIsLoading(false);
@@ -138,8 +155,10 @@ const usePaymentApi = () => {
     /** @type {string|null} Error message */
     error,
     /** @type {Function} Create payment function */
-    createPayment,
+    createOrder,
     /** @type {Function} Fetch payments function */
+    getOrderDetails,
+
     fetchPayments,
     /** @type {Function} Get payment by ID function */
     getPaymentById,
