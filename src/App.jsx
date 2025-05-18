@@ -9,7 +9,6 @@ import PrivateRoute from './components/PrivateRoute';
 import UsersPage from './pages/UsersPage';
 import VendorsPage from './pages/VendorsPage';
 import Services from './pages/vendor/Services';
-import PaymentTest from './components/PaymentTest';
 import PaymentStatus from './components/PaymentStatus';
 
 function App() {
@@ -66,7 +65,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route path='/test-payment' element={<PaymentTest />} />
         <Route path='/payment-status/:orderId' element={<PaymentStatus />} />
         <Route path='/' element={<Navigate to='/login' replace />} />
       </Routes>

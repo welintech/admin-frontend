@@ -1,11 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import api from '../api';
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { useMembers } from '../hooks/useMemberApi';
-import usePaymentApi from '../hooks/usePaymentApi';
-import { useNavigate } from 'react-router-dom';
-import initializeSDK from '../services/cashfreeService';
+import PaymentButton from './PaymentButton';
+import api from '../api';
 
 const LoanProtectionCalculator = () => {
   const [selectedMember, setSelectedMember] = useState('');
@@ -13,10 +11,6 @@ const LoanProtectionCalculator = () => {
   const [loanStartDate, setLoanStartDate] = useState('');
   const [loanEndDate, setLoanEndDate] = useState('');
   const [premiumDetails, setPremiumDetails] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const { createOrder } = usePaymentApi();
-  const navigate = useNavigate();
 
   // Get vendor data from localStorage
   const vendorData = useMemo(() => {
@@ -78,13 +72,12 @@ const LoanProtectionCalculator = () => {
     return true;
   };
 
-  const calculatePremium = async () => {
-    if (!selectedMember || !loanAmount || !validateDates()) {
-      return;
-    }
+  const calculatePremiumMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedMember || !loanAmount || !validateDates()) {
+        throw new Error('Please fill all required fields');
+      }
 
-    setIsLoading(true);
-    try {
       const loanPeriod = calculateLoanPeriod(loanStartDate, loanEndDate);
       const loanAmountNum = parseFloat(loanAmount);
 
@@ -95,7 +88,10 @@ const LoanProtectionCalculator = () => {
         },
       });
 
-      const { data } = response.data;
+      return response.data;
+    },
+    onSuccess: (response) => {
+      const { data } = response;
       const gst = data.premiumAmount * 0.05;
       const totalPremium = data.premiumAmount + gst;
 
@@ -108,69 +104,14 @@ const LoanProtectionCalculator = () => {
         totalPremium,
         isExactMatch: data.isExactMatch,
       });
-    } catch (error) {
+    },
+    onError: (error) => {
       toast.error(
         error.response?.data?.message || 'Failed to calculate premium'
       );
       console.error('Premium calculation error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleCheckout = async () => {
-    if (!premiumDetails) {
-      toast.error('Please calculate premium first');
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      // Initialize Cashfree SDK
-      const cashfree = await initializeSDK();
-      console.log('Cashfree SDK initialized:', cashfree);
-
-      // Create order with required data
-      const orderData = {
-        amount: premiumDetails.totalPremium.toString(),
-        currency: 'INR',
-        paymentMethod: 'payment_link',
-        status: 'pending',
-        type: 'loneCover',
-        return_url: `${window.location.origin}/payment-status`,
-      };
-
-      // Create order
-      const orderResponse = await createOrder(orderData);
-
-      if (!orderResponse) {
-        throw new Error('Failed to create order');
-      }
-
-      // Get the payment session ID from the response
-      const paymentSessionId = orderResponse.payment_session_id;
-
-      if (!paymentSessionId) {
-        throw new Error('Payment session ID not found in response');
-      }
-
-      // Configure checkout options
-      const checkoutOptions = {
-        paymentSessionId: paymentSessionId,
-        redirectTarget: '_self', // Opens in the same tab
-      };
-
-      // Initialize the checkout
-      cashfree.checkout(checkoutOptions);
-
-      toast.success('Redirecting to payment page...');
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error('Failed to initialize payment');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+    },
+  });
 
   return (
     <div className='max-w-2xl mx-auto'>
@@ -209,7 +150,7 @@ const LoanProtectionCalculator = () => {
               onChange={(e) => setLoanAmount(e.target.value)}
               className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
               placeholder='Enter loan amount'
-              disabled={isLoading}
+              disabled={calculatePremiumMutation.isPending}
               min='10000'
               max='1000000'
             />
@@ -226,7 +167,7 @@ const LoanProtectionCalculator = () => {
                 onChange={(e) => setLoanStartDate(e.target.value)}
                 className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                 min={new Date().toISOString().split('T')[0]}
-                disabled={isLoading}
+                disabled={calculatePremiumMutation.isPending}
               />
             </div>
 
@@ -240,23 +181,25 @@ const LoanProtectionCalculator = () => {
                 onChange={(e) => setLoanEndDate(e.target.value)}
                 className='w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500'
                 min={loanStartDate || new Date().toISOString().split('T')[0]}
-                disabled={isLoading}
+                disabled={calculatePremiumMutation.isPending}
               />
             </div>
           </div>
 
           <button
-            onClick={calculatePremium}
+            onClick={() => calculatePremiumMutation.mutate()}
             disabled={
               !selectedMember ||
               !loanAmount ||
               !loanStartDate ||
               !loanEndDate ||
-              isLoading
+              calculatePremiumMutation.isPending
             }
             className='w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
           >
-            {isLoading ? 'Calculating...' : 'Calculate Premium'}
+            {calculatePremiumMutation.isPending
+              ? 'Calculating...'
+              : 'Calculate Premium'}
           </button>
         </div>
 
@@ -312,13 +255,10 @@ const LoanProtectionCalculator = () => {
             </div>
 
             <div className='mt-6'>
-              <button
-                onClick={handleCheckout}
-                disabled={isProcessing}
-                className='w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed'
-              >
-                {isProcessing ? 'Processing...' : 'Proceed to Payment'}
-              </button>
+              <PaymentButton
+                amount={premiumDetails.totalPremium}
+                type='loneCover'
+              />
             </div>
           </div>
         )}
