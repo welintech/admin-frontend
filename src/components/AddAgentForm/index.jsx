@@ -3,12 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
 import FormInput from '../FormInput';
-import FormSelect from '../FormSelect';
 import Button from '../Button';
 import Modal from '../Modal';
 import api from '../../api';
 import { toast } from 'react-toastify';
-import PasswordInput from '../PasswordInput';
 
 const Form = styled.form`
   display: flex;
@@ -23,24 +21,9 @@ const ButtonContainer = styled.div`
   margin-top: ${theme.spacing.md};
 `;
 
-const roleOptions = [
-  { value: 'user', label: 'User' },
-  { value: 'vendor', label: 'Vendor' },
-];
-
-const createUser = async (userData) => {
-  const response = await api.post('/admin/user', userData);
+const createAgent = async (agentData) => {
+  const response = await api.post('/agent', agentData);
   return response.data;
-};
-
-const checkMobileExists = async (mobile) => {
-  try {
-    const response = await api.get(`/admin/user/check-mobile/${mobile}`);
-    return response.data.exists;
-  } catch (error) {
-    console.error('Error checking mobile number:', error);
-    return false;
-  }
 };
 
 const validateEmail = (email) => {
@@ -53,26 +36,21 @@ const validateMobile = (mobile) => {
   return mobileRegex.test(mobile);
 };
 
-const validatePassword = (password) => {
-  // At least 6 characters, at least one letter and one number
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-  return passwordRegex.test(password);
-};
-
 const validateName = (name) => {
-  // Name should contain only letters and spaces, at least 2 characters
   const nameRegex = /^[a-zA-Z\s]{2,}$/;
   return nameRegex.test(name);
 };
 
-const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
+const AddAgentForm = ({ isOpen, onClose, onSuccess, componentId }) => {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
     mobile: '',
-    role: 'user',
+    role: {
+      role: 'agent',
+      componentId: componentId,
+    },
   });
 
   const [errors, setErrors] = useState({});
@@ -94,33 +72,10 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (!validatePassword(formData.password)) {
-      newErrors.password =
-        'Password must be at least 6 characters long and contain at least one letter and one number';
-    }
-
     if (!formData.mobile.trim()) {
       newErrors.mobile = 'Mobile number is required';
     } else if (!validateMobile(formData.mobile)) {
       newErrors.mobile = 'Please enter a valid 10-digit mobile number';
-    } else {
-      setIsCheckingMobile(true);
-      try {
-        const mobileExists = await checkMobileExists(formData.mobile);
-        if (mobileExists) {
-          newErrors.mobile = 'This mobile number is already registered';
-        }
-      } catch (error) {
-        newErrors.mobile = 'Error checking mobile number availability';
-      } finally {
-        setIsCheckingMobile(false);
-      }
-    }
-
-    if (!formData.role) {
-      newErrors.role = 'Role is required';
     }
 
     setErrors(newErrors);
@@ -128,22 +83,23 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
   };
 
   const mutation = useMutation({
-    mutationFn: createUser,
+    mutationFn: createAgent,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['adminCounts'] });
       setFormData({
         name: '',
         email: '',
-        password: '',
         mobile: '',
-        role: 'user',
+        role: {
+          componentId: componentId,
+          role: 'agent',
+        },
       });
       setErrors({});
-      toast.success('User created successfully!');
+      toast.success('Agent created successfully!');
       if (onSuccess) onSuccess();
     },
     onError: (error) => {
-      toast.error(error.response?.data?.message || 'Failed to create user');
+      toast.error(error.response?.data?.message || 'Failed to create agent');
     },
   });
 
@@ -157,14 +113,13 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
     }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title='Add New User'>
+    <Modal isOpen={isOpen} onClose={onClose} title='Add New Agent'>
       <Form onSubmit={handleSubmit}>
         <FormInput
           label='Name'
@@ -183,21 +138,6 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
           error={errors.email}
           required
         />
-        <div>
-          <label className='block text-sm font-medium text-gray-700'>
-            Password
-          </label>
-          <PasswordInput
-            name='password'
-            value={formData.password}
-            onChange={handleChange}
-            placeholder='Enter password'
-            className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
-          />
-          {errors.password && (
-            <p className='mt-1 text-sm text-red-600'>{errors.password}</p>
-          )}
-        </div>
         <FormInput
           label='Mobile Number'
           name='mobile'
@@ -208,25 +148,9 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
           required
           disabled={isCheckingMobile}
         />
-        <FormSelect
-          label='Role'
-          name='role'
-          value={formData.role}
-          onChange={handleChange}
-          options={roleOptions}
-          error={errors.role}
-          required
-        />
         <ButtonContainer>
-          <Button
-            type='submit'
-            disabled={mutation.isPending || isCheckingMobile}
-          >
-            {mutation.isPending
-              ? 'Creating...'
-              : isCheckingMobile
-              ? 'Checking...'
-              : 'Create User'}
+          <Button type='submit' disabled={isCheckingMobile}>
+            {isCheckingMobile ? 'Checking...' : 'Create Agent'}
           </Button>
         </ButtonContainer>
       </Form>
@@ -234,4 +158,4 @@ const AddUserForm = ({ isOpen, onClose, onSuccess }) => {
   );
 };
 
-export default AddUserForm;
+export default AddAgentForm;

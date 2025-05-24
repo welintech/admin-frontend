@@ -4,12 +4,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import VendorDashboard from './pages/VendorDashboard';
-import UserDashboard from './pages/UserDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import UsersPage from './pages/UsersPage';
-import VendorsPage from './pages/VendorsPage';
-import Services from './pages/vendor/Services';
-import PaymentStatus from './components/PaymentStatus';
 
 function App() {
   return (
@@ -34,18 +30,10 @@ function App() {
           }
         />
         <Route
-          path='/vendor/services/:serviceId'
+          path='/agent'
           element={
-            <PrivateRoute role='vendor'>
-              <Services />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path='/user'
-          element={
-            <PrivateRoute role='user'>
-              <UserDashboard />
+            <PrivateRoute role='agent'>
+              <VendorDashboard />
             </PrivateRoute>
           }
         />
@@ -57,15 +45,6 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path='/admin/vendors'
-          element={
-            <PrivateRoute role='admin'>
-              <VendorsPage />
-            </PrivateRoute>
-          }
-        />
-        <Route path='/payment-status/:orderId' element={<PaymentStatus />} />
         <Route path='/' element={<Navigate to='/login' replace />} />
       </Routes>
     </div>

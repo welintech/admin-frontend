@@ -8,7 +8,7 @@ const ButtonBase = styled.button`
   font-weight: 600;
   padding: ${theme.spacing.sm} ${theme.spacing.md};
   border-radius: ${theme.borderRadius.sm};
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   display: inline-flex;
@@ -36,12 +36,34 @@ const PrimaryButton = styled(ButtonBase)`
   }
 `;
 
+const OutlinePrimaryButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: ${theme.colors.primary.main};
+  border-color: ${theme.colors.primary.main};
+
+  &:hover:not(:disabled) {
+    background-color: ${theme.colors.primary.main};
+    color: ${theme.colors.text.light};
+  }
+`;
+
 const SecondaryButton = styled(ButtonBase)`
   background-color: ${theme.colors.secondary.main};
   color: ${theme.colors.text.primary};
 
   &:hover:not(:disabled) {
     background-color: ${theme.colors.secondary.dark};
+  }
+`;
+
+const OutlineSecondaryButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: ${theme.colors.secondary.main};
+  border-color: ${theme.colors.secondary.main};
+
+  &:hover:not(:disabled) {
+    background-color: ${theme.colors.secondary.main};
+    color: ${theme.colors.text.primary};
   }
 `;
 
@@ -54,11 +76,25 @@ const DangerButton = styled(ButtonBase)`
   }
 `;
 
+const OutlineDangerButton = styled(ButtonBase)`
+  background-color: transparent;
+  color: ${theme.colors.error.main};
+  border-color: ${theme.colors.error.main};
+
+  &:hover:not(:disabled) {
+    background-color: ${theme.colors.error.main};
+    color: ${theme.colors.text.light};
+  }
+`;
+
 const Button = ({ variant = 'primary', children, ...props }) => {
   const ButtonComponent = {
     primary: PrimaryButton,
+    'outline-primary': OutlinePrimaryButton,
     secondary: SecondaryButton,
+    'outline-secondary': OutlineSecondaryButton,
     danger: DangerButton,
+    'outline-danger': OutlineDangerButton,
   }[variant];
 
   return <ButtonComponent {...props}>{children}</ButtonComponent>;

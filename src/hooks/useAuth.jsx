@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }) => {
           toast.success('Login successful');
 
           // Navigate based on user role or default to dashboard
-          const role = user?.role;
+          const role = user?.role.role;
           navigate(`/${role}`);
         } catch (error) {
           console.error('Error saving auth data:', error);

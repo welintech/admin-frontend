@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import styled from 'styled-components';
-import { theme } from '../styles/theme';
+import DashboardLayout from '../../components/DashboardLayout';
+import AddAgentForm from '../../components/AddAgentForm';
+import MembersTable from '../../components/MembersTable';
+import Button from '../../components/Button';
 import { Form } from 'react-bootstrap';
-import api from '../api';
-import MembersTable from '../components/MembersTable';
-import LoadingSpinner from '../components/LoadingSpinner';
-import Button from '../components/Button';
-import DashboardLayout from '../components/DashboardLayout';
+import styled from 'styled-components';
+import { theme } from '../../styles/theme';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../api';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import {
   startOfDay,
   endOfDay,
@@ -15,7 +16,7 @@ import {
   endOfWeek,
   startOfMonth,
   endOfMonth,
-  parseISO,
+  format,
 } from 'date-fns';
 
 const ContentContainer = styled.div`
@@ -69,30 +70,31 @@ const DateButton = styled(Button)`
   }
 `;
 
-const AdminDashboard = () => {
-  const [selectedVendorId, setSelectedVendorId] = useState('');
+const TirumallaAdmin = () => {
+  const [showAddAgent, setShowAddAgent] = useState(false);
+  const [selectedAgentId, setSelectedAgentId] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const { data: vendors, isLoading: isLoadingVendors } = useQuery({
-    queryKey: ['vendors'],
+  const { data: agents, isLoading: isLoadingAgents } = useQuery({
+    queryKey: ['agents'],
     queryFn: async () => {
-      const response = await api.get('/admin/vendor');
+      const response = await api.get('/agent');
       return response.data.data;
     },
   });
 
   const { data: members, isLoading: isLoadingMembers } = useQuery({
-    queryKey: ['members', selectedVendorId, dateFilter, startDate, endDate],
+    queryKey: ['members', selectedAgentId, dateFilter, startDate, endDate],
     queryFn: async () => {
       const response = await api.get('/member');
       let allMembers = response.data.data;
 
-      // Filter by vendor
-      if (selectedVendorId) {
+      // Filter by agent
+      if (selectedAgentId) {
         allMembers = allMembers.filter(
-          (member) => member.vendorId._id === selectedVendorId
+          (member) => member.agent === selectedAgentId
         );
       }
 
@@ -125,7 +127,7 @@ const AdminDashboard = () => {
         }
 
         allMembers = allMembers.filter((member) => {
-          const memberDate = parseISO(member.createdAt);
+          const memberDate = new Date(member.createdAt);
           return memberDate >= start && memberDate <= end;
         });
       }
@@ -135,8 +137,12 @@ const AdminDashboard = () => {
     enabled: true,
   });
 
-  const handleVendorChange = (event) => {
-    setSelectedVendorId(event.target.value);
+  const handleAgentCreated = () => {
+    setShowAddAgent(false);
+  };
+
+  const handleAgentChange = (event) => {
+    setSelectedAgentId(event.target.value);
   };
 
   const handleDateFilterChange = (filter) => {
@@ -148,25 +154,28 @@ const AdminDashboard = () => {
   };
 
   return (
-    <DashboardLayout title='Admin Dashboard'>
+    <DashboardLayout title='Tirumalla Admin Dashboard'>
       <ContentContainer>
         <HeaderContainer>
           <SectionTitle>All Members</SectionTitle>
+          <Button variant='primary' onClick={() => setShowAddAgent(true)}>
+            Add New Agent
+          </Button>
         </HeaderContainer>
 
         <FilterContainer>
           <StyledForm>
             <Form.Group>
-              <Form.Label>Filter by Vendor</Form.Label>
+              <Form.Label>Filter by Agent</Form.Label>
               <Form.Select
-                value={selectedVendorId}
-                onChange={handleVendorChange}
-                disabled={isLoadingVendors}
+                value={selectedAgentId}
+                onChange={handleAgentChange}
+                disabled={isLoadingAgents}
               >
-                <option value=''>All Vendors</option>
-                {vendors?.map((vendor) => (
-                  <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
+                <option value=''>All Agents</option>
+                {agents?.map((agent) => (
+                  <option key={agent._id} value={agent._id}>
+                    {agent.name}
                   </option>
                 ))}
               </Form.Select>
@@ -236,9 +245,16 @@ const AdminDashboard = () => {
         ) : (
           <MembersTable data={members || []} isLoading={isLoadingMembers} />
         )}
+
+        <AddAgentForm
+          isOpen={showAddAgent}
+          onClose={() => setShowAddAgent(false)}
+          onSuccess={handleAgentCreated}
+          componentId='tirumalla-agent'
+        />
       </ContentContainer>
     </DashboardLayout>
   );
 };
 
-export default AdminDashboard;
+export default TirumallaAdmin;

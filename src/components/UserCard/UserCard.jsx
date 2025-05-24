@@ -262,7 +262,7 @@ export const UserCardComponent = ({ user }) => {
         </MenuContainer>
         <CardHeader>
           <UserName>{user.name}</UserName>
-          <UserRole>{user.role}</UserRole>
+          <UserRole>{user.role.role}</UserRole>
         </CardHeader>
         <UserDetails>
           <DetailRow>

@@ -6,6 +6,7 @@ import Button from './Button';
 
 const DashboardLayout = ({ children, title }) => {
   const { user, logout } = useAuth();
+  const role = user?.role.role;
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -32,37 +33,14 @@ const DashboardLayout = ({ children, title }) => {
           </h2>
         </div>
         <nav>
-          <Layout.NavItem as={NavLink} to={`/${user?.role}`} end>
+          <Layout.NavItem as={NavLink} to={`/${role}`} end>
             Overview
           </Layout.NavItem>
-          {user?.role === 'admin' && (
+          {role === 'admin' && (
             <>
               <Layout.NavItem as={NavLink} to='/admin/users'>
                 Users
               </Layout.NavItem>
-              <Layout.NavItem as={NavLink} to='/admin/vendors'>
-                Vendors
-              </Layout.NavItem>
-            </>
-          )}
-          {user?.role === 'vendor' && (
-            <>
-              <Layout.NavItem>Items</Layout.NavItem>
-              <Layout.NavItem as={NavLink} to='/vendor/services/service-1'>
-                Services
-              </Layout.NavItem>
-            </>
-          )}
-          {user?.role === 'user' && (
-            <>
-              <Layout.NavItem>Profile</Layout.NavItem>
-              <Layout.NavItem>Activity</Layout.NavItem>
-              {/* <Layout.NavItem as={NavLink} to='/user/profile'>
-                Profile
-              </Layout.NavItem>
-              <Layout.NavItem as={NavLink} to='/user/activity'>
-                Activity
-              </Layout.NavItem> */}
             </>
           )}
         </nav>
