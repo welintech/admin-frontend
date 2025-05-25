@@ -148,7 +148,7 @@ const AddMemberForm = ({
       if (initialData) {
         setFormData(initialData);
       } else {
-        setFormData(useTestData ? TEST_DATA : EMPTY_FORM_DATA);
+        setFormData(useTestData === 'true' ? TEST_DATA : EMPTY_FORM_DATA);
       }
       setErrors({});
     }

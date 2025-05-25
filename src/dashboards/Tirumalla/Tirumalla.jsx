@@ -11,6 +11,12 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import api from '../../api';
 
 const formatErrorMessage = (error) => {
+  // If it's an HTML error response
+  if (error.response?.data?.includes('<!DOCTYPE html>')) {
+    return 'Server error occurred. Please try again later.';
+  }
+
+  // If it's a regular error response
   if (!error.response?.data?.message) {
     return 'An unexpected error occurred. Please try again.';
   }
@@ -32,13 +38,20 @@ const formatErrorMessage = (error) => {
     return 'Please check your input and try again.';
   }
 
+  // Handle TypeError from backend
+  if (errorMessage.includes('TypeError')) {
+    return 'Server error occurred. Please try again later.';
+  }
+
   // Default error message
-  return 'Failed to save member. Please try again.';
+  return errorMessage || 'Failed to save member. Please try again.';
 };
 
 const Tirumalla = () => {
   const [showModal, setShowModal] = useState(false);
-  const [useTestData, setUseTestData] = useState(true);
+  const [useTestData, setUseTestData] = useState(
+    import.meta.env.VITE_REACT_DEV
+  );
   const [successMessage, setSuccessMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [previewData, setPreviewData] = useState(null);
@@ -97,7 +110,8 @@ const Tirumalla = () => {
       setErrorMessage(null);
     } catch (error) {
       console.error('Error saving member:', error);
-      setErrorMessage(formatErrorMessage(error));
+      const formattedError = formatErrorMessage(error);
+      setErrorMessage(formattedError);
     }
   };
 
@@ -114,12 +128,12 @@ const Tirumalla = () => {
           <Button variant='primary' onClick={handleShow}>
             Add Member
           </Button>
-          {['true', 'True'].includes(import.meta.env.VITE_REACT_DEV) && (
+          {useTestData === 'true' && (
             <Form.Check
               type='switch'
               id='test-data-switch'
               label='Use Test Data'
-              checked={useTestData}
+              checked={true}
               onChange={(e) => setUseTestData(e.target.checked)}
             />
           )}
