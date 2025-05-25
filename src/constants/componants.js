@@ -5,5 +5,6 @@ import AdminDashboard from '../pages/AdminDashboard';
 export const components = {
   'tirumalla-admin': TirumallaAdmin,
   'tirumalla-agent': Tirumalla,
-  admin: AdminDashboard,
 };
+
+export const displayComponents = ['tirumalla-admin'];

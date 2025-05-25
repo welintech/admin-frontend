@@ -8,6 +8,7 @@ import MembersTable from '../components/MembersTable';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Button from '../components/Button';
 import DashboardLayout from '../components/DashboardLayout';
+import AddVendorForm from '../components/AddVendorForm';
 import {
   startOfDay,
   endOfDay,
@@ -74,6 +75,7 @@ const AdminDashboard = () => {
   const [dateFilter, setDateFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [showAddVendor, setShowAddVendor] = useState(false);
 
   const { data: vendors, isLoading: isLoadingVendors } = useQuery({
     queryKey: ['vendors'],
@@ -152,6 +154,9 @@ const AdminDashboard = () => {
       <ContentContainer>
         <HeaderContainer>
           <SectionTitle>All Members</SectionTitle>
+          <Button variant='primary' onClick={() => setShowAddVendor(true)}>
+            Add New Vendor
+          </Button>
         </HeaderContainer>
 
         <FilterContainer>
@@ -236,6 +241,11 @@ const AdminDashboard = () => {
         ) : (
           <MembersTable data={members || []} isLoading={isLoadingMembers} />
         )}
+
+        <AddVendorForm
+          show={showAddVendor}
+          onHide={() => setShowAddVendor(false)}
+        />
       </ContentContainer>
     </DashboardLayout>
   );
