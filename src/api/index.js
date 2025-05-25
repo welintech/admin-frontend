@@ -33,6 +33,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Skip token refresh for change password endpoint
+    if (originalRequest.url === '/auth/change-password') {
+      return Promise.reject(error);
+    }
+
     // If error is 401 and we haven't tried to refresh token yet
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
