@@ -114,13 +114,15 @@ const Tirumalla = () => {
           <Button variant='primary' onClick={handleShow}>
             Add Member
           </Button>
-          <Form.Check
-            type='switch'
-            id='test-data-switch'
-            label='Use Test Data'
-            checked={useTestData}
-            onChange={(e) => setUseTestData(e.target.checked)}
-          />
+          {['true', 'True'].includes(import.meta.env.VITE_REACT_DEV) && (
+            <Form.Check
+              type='switch'
+              id='test-data-switch'
+              label='Use Test Data'
+              checked={useTestData}
+              onChange={(e) => setUseTestData(e.target.checked)}
+            />
+          )}
         </div>
 
         {errorMessage && (
