@@ -172,6 +172,10 @@ const LoneCoverDetails = ({ details }) => {
         <div className='value'>{formatCurrency(details.loanAmount)}</div>
       </DetailItem>
       <DetailItem>
+        <div className='label'>Loan Type</div>
+        <div className='value'>{details.loanType}</div>
+      </DetailItem>
+      <DetailItem>
         <div className='label'>Coverage Period</div>
         <div className='value'>
           {formatDate(details.coverageStartDate)} -{' '}

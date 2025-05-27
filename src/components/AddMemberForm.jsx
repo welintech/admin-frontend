@@ -29,6 +29,10 @@ const RELATIONSHIP_OPTIONS = [
   { value: 'spouse', label: 'Spouse' },
   { value: 'son', label: 'Son' },
   { value: 'daughter', label: 'Daughter' },
+  { value: 'brother', label: 'Brother' },
+  { value: 'sister', label: 'Sister' },
+  { value: 'father', label: 'Father' },
+  { value: 'mother', label: 'Mother' },
 ];
 
 // Test data - Easy to remove later by deleting this object
@@ -89,6 +93,7 @@ const LOAN_TYPES = [
   { value: 'business', label: 'Business Loan' },
   { value: 'education', label: 'Education Loan' },
   { value: 'home', label: 'Home Loan' },
+  { value: 'other', label: 'Other' },
 ];
 
 const AddMemberForm = ({
@@ -306,6 +311,23 @@ const AddMemberForm = ({
 
   const handleLoanInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Special handling for loan type
+    if (name === 'loanType') {
+      setFormData((prevState) => ({
+        ...prevState,
+        loan: {
+          ...prevState.loan,
+          [name]: value,
+          // Clear premium values when loan type changes
+          basePremium: '',
+          gst: '',
+          totalPremium: '',
+          duration: '',
+        },
+      }));
+      return;
+    }
 
     // Clear premium values if loan amount or dates are changed
     if (name === 'amount' || name === 'startDate' || name === 'endDate') {
@@ -638,20 +660,51 @@ const AddMemberForm = ({
         <Col md={6}>
           <Form.Group className='mb-3'>
             <Form.Label>Loan Type</Form.Label>
-            <Form.Select
-              name='loanType'
-              value={formData.loan.loanType}
-              onChange={handleLoanInputChange}
-              isInvalid={!!errors.loanType}
-              required
-            >
-              <option value=''>Select Loan Type</option>
-              {LOAN_TYPES.map((type) => (
-                <option key={type.value} value={type.value}>
-                  {type.label}
-                </option>
-              ))}
-            </Form.Select>
+            {formData.loan.loanType === 'other' ||
+            (formData.loan.loanType &&
+              !LOAN_TYPES.some(
+                (type) => type.value === formData.loan.loanType
+              )) ? (
+              <Form.Control
+                type='text'
+                name='loanType'
+                value={
+                  formData.loan.loanType === 'other'
+                    ? ''
+                    : formData.loan.loanType
+                }
+                onChange={(e) => {
+                  setFormData((prevState) => ({
+                    ...prevState,
+                    loan: {
+                      ...prevState.loan,
+                      loanType: e.target.value,
+                      basePremium: '',
+                      gst: '',
+                      totalPremium: '',
+                      duration: '',
+                    },
+                  }));
+                }}
+                placeholder='Enter loan type'
+                required
+              />
+            ) : (
+              <Form.Select
+                name='loanType'
+                value={formData.loan.loanType}
+                onChange={handleLoanInputChange}
+                isInvalid={!!errors.loanType}
+                required
+              >
+                <option value=''>Select Loan Type</option>
+                {LOAN_TYPES.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </Form.Select>
+            )}
             <Form.Control.Feedback type='invalid'>
               {errors.loanType}
             </Form.Control.Feedback>
